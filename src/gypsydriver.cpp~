@@ -1,0 +1,50 @@
+/*
+ * gypsydriver.cpp
+ *
+ *  Created on: Sep 28, 2013
+ *      Author: daniel
+ */
+
+#include "ros/ros.h"
+#include "std_msgs/Strings.h"
+
+#include "beagleIO.h"
+#include "sabertooh.h"
+#include "gypsydriver.h"
+
+// Global variables
+Sabertooth ST(HBRIDGE_ADDRESS, &HBRIDGE_SERIAL_TX_PIN);
+
+void command_callback(const std_msgs::String::ConstPtr& msg) {
+	ST.drive(msg.linear.x);
+  	ST.turn(msg.angular.z);
+}
+
+void motor_init() {
+	// Init Serial port for H-Bridge
+	HBRIDGE_SERIAL_TX_PIN.openPort(BR_38400, PB_NONE);
+
+	// Init H-Bridge shutdown pin
+	HBRIDGE_SHUTDOWN.exportPin();
+	HBRIDGE_SHUTDOWN.setDirection(OUTPUT_PIN);
+	HBRIDGE_SHUTDOWN.writePin(true);
+  
+	ST.setDeadband(HBRIDGE_DEADBAND);       // Set deadband width
+	ST.setMinVoltage(HBRIDGE_MIN_VOLTAGE);  // Set battery cutoff
+	ST.setTimeout(HBRIDGE_TIMEOUT);		// Set serial timeout
+}
+
+main (int argc, char** argv) {
+	motor_init();
+
+	ros::init(argc, argv "gypsy_driver");
+
+	ros::NodeHandler n;
+
+	ros::Subscribe sub = n.subscribe("cmd_vel", command_callback);
+
+	ros::spin();
+
+	return 0;
+}
+

@@ -1,0 +1,17 @@
+/*
+ * gypsydriver.h
+ *
+ *  Created on: Sep 28, 2013
+ *      Author: daniel
+ */
+
+#ifndef GYPSYDRIVER_H_
+#define GYPSYDRIVER_H_
+
+class gypsy_driver {
+public:
+				 gypsy_driver();
+	virtual		~gypsy_driver();
+};
+
+#endif /* GYPSYDRIVER_H_ */
